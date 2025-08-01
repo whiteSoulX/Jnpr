@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dragon</title>
+  <link rel="stylesheet" href="design.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Roboto&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="header-container">
+    <h1>You know what you need to do.</h1>
+  </div>
+
+  <div class="puzzle-container">
+    <div class="flag-box">
+      <img src="puzzle1.jpg" alt="Puzzle 1">
+    </div>
+    <div class="flag-box">
+      <img src="puzzle2.png  " alt="Puzzle 2">
+    </div>
+  </div>
+
+  <div class="input-container">
+    <input type="text" id="userKey" placeholder="Enter the final key" />
+    <button onclick="checkKey()" id="submitBtn">ENTER</button>
+    <p id="lockMsg" class="hidden">Too many attempts. Try again after 3 hours.</p>
+  </div>
+
+  <script>
+    const correctKey = "xoo";
+    const maxAttempts = 3;
+    const lockHours = 3;
+    const inputField = document.getElementById("userKey");
+    const button = document.getElementById("submitBtn");
+    const lockMsg = document.getElementById("lockMsg");
+
+    function checkLockStatus() {
+      const lockedUntil = localStorage.getItem("lockedUntil");
+      if (lockedUntil && Date.now() < parseInt(lockedUntil)) {
+        disableInput();
+      }
+    }
+
+    function disableInput() {
+      inputField.disabled = true;
+      button.disabled = true;
+      lockMsg.classList.remove("hidden");
+    }
+
+    function checkKey() {
+      const key = inputField.value.trim();
+      let attempts = parseInt(localStorage.getItem("attempts")) || 0;
+
+      if (key === correctKey) {
+        localStorage.removeItem("attempts");
+        window.location.href = "city.html";
+      } else {
+        attempts += 1;
+        localStorage.setItem("attempts", attempts);
+
+        if (attempts >= maxAttempts) {
+          const lockUntil = Date.now() + lockHours * 60 * 60 * 1000;
+          localStorage.setItem("lockedUntil", lockUntil);
+          disableInput();
+        } else {
+          alert(`Wrong key. Attempts left: ${maxAttempts - attempts}`);
+        }
+      }
+    }
+
+    checkLockStatus();
+  </script>
+
+</body>
+</html>
